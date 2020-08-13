@@ -32,6 +32,5 @@ if ($_GET['winner'] && $_GET['loser']) {
  // Back to the frontpage
  header('location: /');
  
-}
- 
+} 
 ?>

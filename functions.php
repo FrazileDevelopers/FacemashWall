@@ -11,4 +11,8 @@ function win($score, $expected, $k = 24) {
 function loss($score, $expected, $k = 24) {
  return $score + $k * (0-$expected);
 }
+// Calculate the new download score
+function download($score, $expected, $download) {
+    return $score + $downloads * (1-$expected);
+}
 ?>
