@@ -1,6 +1,6 @@
 <!-- <?php
 include('mysql.php');
-$dirname = 'GirlWalls/';
+$dirname = 'FlowerWalls';
 
 if ($handle = opendir('images/'.$dirname)) {
  /* This is the correct way to loop over the directory. */

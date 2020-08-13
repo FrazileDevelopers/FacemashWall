@@ -29,8 +29,13 @@ if ($_GET['winner'] && $_GET['loser']) {
  // Insert battle
  mysqli_query($conn, "INSERT INTO battles SET winner = ".$_GET['winner'].", loser = ".$_GET['loser']." ");
  
- // Back to the frontpage
+if ($_GET['cat']) {
+ // Back to the frontpage with a cat
+ header("location: /?cat=".$_GET['cat']);
+} else {
+     // Back to the frontpage
  header('location: /');
+}
  
 } 
 ?>

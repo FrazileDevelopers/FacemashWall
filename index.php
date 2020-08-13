@@ -5,14 +5,27 @@
 
 include('mysql.php');
 include('functions.php');
+
+// Get the cat
+$cat = 'Girls';
+if ($_GET['cat']) {
+	$c = $_GET['cat'];
+	$query = "SELECT COUNT(DISTINCT(dirname)) AS count FROM images WHERE dirname='".$c."'";
+	$result = @mysqli_query($conn, $query);
+	$row = mysqli_fetch_assoc($result);
+	if($row['count'] != 0) {
+		$cat = $_GET['cat'];
+	}
+}
+
 // Get random 2
-$query="SELECT * FROM images ORDER BY RAND() LIMIT 0,30";
+$query="SELECT * FROM images WHERE dirname='".$cat."' ORDER BY RAND() LIMIT 0,30";
 $result = @mysqli_query($conn, $query);
 while($row = mysqli_fetch_object($result)) {
 	$images[] = (object) $row;
 }
 // Get the top10
-$result = mysqli_query($conn, "SELECT *, ROUND(score/(1+(losses/wins))) AS performance FROM images ORDER BY ROUND(score/(1+(losses/wins))) DESC LIMIT 0,10");
+$result = mysqli_query($conn, "SELECT *, ROUND(score/(1+(losses/wins))) AS performance FROM images WHERE dirname='".$cat."' ORDER BY ROUND(score/(1+(losses/wins))) DESC LIMIT 0,10");
 while($row = mysqli_fetch_object($result)) $top_ratings[] = (object) $row;
 // Close the connection
 mysqli_close($conn);
@@ -43,11 +56,11 @@ td {font-size:11px;}
 $(document).keydown(function (e){ 
     if(e.keyCode == 37) // left arrow key
     {
-	window.location.href='rate.php?winner=<?=$images[0]->image_id?>&loser=<?=$images[1]->image_id?>';
+	window.location.href='rate.php?winner=<?=$images[0]->image_id?>&loser=<?=$images[1]->image_id?>&cat=<?=$cat?>';
     }
     else if(e.keyCode == 39)    // right arrow key
     {
-	window.location.href='rate.php?winner=<?=$images[1]->image_id?>&loser=<?=$images[0]->image_id?>';
+	window.location.href='rate.php?winner=<?=$images[1]->image_id?>&loser=<?=$images[0]->image_id?>&cat=<?=$cat?>';
     }
 });
 </script>
@@ -59,9 +72,9 @@ $(document).keydown(function (e){
 <center>
 <table>
 	<tr>
-		<td valign="top" class="image" id="imageA"><a href="rate.php?winner=<?=$images[0]->image_id?>&loser=<?=$images[1]->image_id?>"><img src="images/<?=$images[0]->dirname?><?=$images[0]->filename?>" width="250px" /></a></td>
+		<td valign="top" class="image" id="imageA"><a href="rate.php?winner=<?=$images[0]->image_id?>&loser=<?=$images[1]->image_id?>&cat=<?=$cat?>"><img src="images/<?=$images[0]->dirname?>/<?=$images[0]->filename?>" width="250px" /></a></td>
 <td valign="center" style="padding: 120px"></td>
-		<td valign="top" class="image" id="imageB"><a href="rate.php?winner=<?=$images[1]->image_id?>&loser=<?=$images[0]->image_id?>"><img src="images/<?=$images[1]->dirname?><?=$images[1]->filename?>" width="250px" /></a></td>
+		<td valign="top" class="image" id="imageB"><a href="rate.php?winner=<?=$images[1]->image_id?>&loser=<?=$images[0]->image_id?>&cat=<?=$cat?>"><img src="images/<?=$images[1]->dirname?>/<?=$images[1]->filename?>" width="250px" /></a></td>
 	</tr>
 	<tr>
 		<td>Won: <?=$images[0]->wins?>, Lost: <?=$images[0]->losses?></td>
@@ -85,7 +98,7 @@ $(document).keydown(function (e){
 <table>
 	<tr>
 		<?php foreach($top_ratings as $key => $image) : ?>
-		<td valign="top"><img src="images/<?=$image->dirname?><?=$image->filename?>" width="50" /></td>
+		<td valign="top"><img src="images/<?=$image->dirname?>/<?=$image->filename?>" width="50" /></td>
 		<?php endforeach ?>
 	</tr>
 	<tr>

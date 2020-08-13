@@ -30,23 +30,51 @@ if ($_GET['downloads']) {
         echo stripslashes($json);
     }
 }
+} else if ($_GET['cat']) {
+        $c = $_GET['cat'];
+        $catquery = "SELECT COUNT(DISTINCT(dirname)) AS count FROM images WHERE dirname='".$c."'";
+        $catresult = @mysqli_query($conn, $catquery);
+        $row = mysqli_fetch_assoc($catresult);
+        if ($row['count'] != 0) {
+            $query="SELECT *, ROUND(score/(1+(losses/wins))) AS performance FROM images WHERE dirname='".$c."' ORDER BY ROUND(score/(1+(losses/wins))) DESC";
+            $result = @mysqli_query($conn, $query);
+            
+            $jsonData = array();
+            if(mysqli_num_rows($result) > 0) {
+            while ($array = mysqli_fetch_assoc($result)) {
+                $jsonData[] = $array;
+            }
+            
+            
+            $json = '{"'.$c.'":';
+            $json .= json_encode($jsonData);
+            $json .= '}';
+            echo stripslashes($json);
+            
+            }        
+        } else {
+            $json = '{"Error":';
+            $json .= '"No Category named found."';
+            $json .= '}';
+            echo stripslashes($json);
+        }
 }
 else {
+    $query="SELECT DISTINCT(dirname) AS category FROM images";
+    $result = @mysqli_query($conn, $query);
+    
+    $jsonData = array();
+    if(mysqli_num_rows($result) > 0) {
+    while ($array = mysqli_fetch_assoc($result)) {
+        $jsonData[] = $array;
+    }
+    
+    
+    $json = '{"Categories":';
+    $json .= json_encode($jsonData);
+    $json .= '}';
+    echo stripslashes($json);
+    
+    }
 
-$query="SELECT *, ROUND(score/(1+(losses/wins))) AS performance FROM images ORDER BY ROUND(score/(1+(losses/wins))) DESC";
-$result = @mysqli_query($conn, $query);
-
-$jsonData = array();
-if(mysqli_num_rows($result) > 0) {
-while ($array = mysqli_fetch_assoc($result)) {
-    $jsonData[] = $array;
-}
-
-
-$json = '{"Girls":';
-$json .= json_encode($jsonData);
-$json .= '}';
-echo stripslashes($json);
-
-}
 }
